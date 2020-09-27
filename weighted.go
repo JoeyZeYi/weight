@@ -1,4 +1,4 @@
-package main
+package weight
 
 type Weighted interface {
 	GetId() uint32
