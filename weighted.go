@@ -40,7 +40,6 @@ func (l *Load) UpdateServers(servers []Weighted) {
 		}
 		return
 	}
-
 build:
 	weighted := make([]*Training, 0)
 	for _, v := range servers {
