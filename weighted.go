@@ -25,22 +25,6 @@ type Load struct {
 }
 
 func (l *Load) UpdateServers(servers []Weighted) {
-	if len(l.Weighted) == len(servers) {
-		for i, _ := range servers {
-			isEqual := false
-			for _, old := range l.Weighted {
-				if servers[i].GetId() == old.GetId() && servers[i].GetWeight() == old.GetWeight() {
-					isEqual = true
-					break
-				}
-			}
-			if !isEqual {
-				goto build
-			}
-		}
-		return
-	}
-build:
 	weighted := make([]*Training, 0)
 	for _, v := range servers {
 		w := &Training{
