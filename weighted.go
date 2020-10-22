@@ -3,6 +3,7 @@ package weight
 type Weighted interface {
 	GetId() uint32
 	GetWeight() int
+	GetNum() int
 }
 
 //初始化一个池子
