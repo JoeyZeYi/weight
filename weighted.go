@@ -8,16 +8,15 @@ type Weighted interface {
 
 //初始化一个池子
 func NewPool(servers []Weighted) *Load {
-	new := &Load{}
-	new.UpdateServers(servers)
-	return new
+	newLoad := &Load{}
+	newLoad.updateServers(servers)
+	return newLoad
 }
 
 type Training struct {
-	Server          Weighted `json:"server"`
-	Weight          int      `json:"weight"`
-	CurrentWeight   int      `json:"current_weight"`
-	EffectiveWeight int      `json:"effective_weight"`
+	Server        Weighted `json:"server"`
+	Weight        int      `json:"weight"`
+	CurrentWeight int      `json:"current_weight"`
 }
 
 type Load struct {
@@ -25,14 +24,13 @@ type Load struct {
 	Training []*Training `json:"weighted"`
 }
 
-func (l *Load) UpdateServers(servers []Weighted) {
+func (l *Load) updateServers(servers []Weighted) {
 	weighted := make([]*Training, 0)
 	for _, v := range servers {
 		w := &Training{
-			Server:          v,
-			Weight:          v.GetWeight(),
-			CurrentWeight:   0,
-			EffectiveWeight: v.GetWeight(),
+			Server:        v,
+			Weight:        v.GetWeight(),
+			CurrentWeight: 0,
 		}
 		weighted = append(weighted, w)
 	}
@@ -41,20 +39,20 @@ func (l *Load) UpdateServers(servers []Weighted) {
 }
 
 //remove为需要屏蔽的ID，没有的话传nil
-func (l *Load) Draw(remove []uint) Weighted {
+func (l *Load) Draw(remove ...uint) Weighted {
 	if len(l.Training) == 0 {
 		return nil
 	}
-	w := l.nextWeighted(l.Training, remove)
+	w := l.nextWeighted(remove)
 	if w == nil {
 		return nil
 	}
 	return w.Server
 }
-func (l *Load) nextWeighted(servers []*Training, remove []uint) (best *Training) {
+func (l *Load) nextWeighted(remove []uint) (best *Training) {
 	total := 0
-	for i := 0; i < len(servers); i++ {
-		w := servers[i]
+	for i := 0; i < len(l.Training); i++ {
+		w := l.Training[i]
 		if w == nil {
 			continue
 		}
@@ -67,13 +65,11 @@ func (l *Load) nextWeighted(servers []*Training, remove []uint) (best *Training)
 		if isFind {
 			continue
 		}
-
-		w.CurrentWeight += w.EffectiveWeight
-		total += w.EffectiveWeight
-		if w.EffectiveWeight < w.Weight {
-			w.EffectiveWeight++
-		}
-
+		//每次都加原始的权重值
+		w.CurrentWeight += w.Weight
+		//所有权重之和
+		total += w.Weight
+		//判断当前最大的权重。不管有没有最大  先取第一个、然后依次对比、取出最大
 		if best == nil || w.CurrentWeight > best.CurrentWeight {
 			best = w
 		}
@@ -81,6 +77,7 @@ func (l *Load) nextWeighted(servers []*Training, remove []uint) (best *Training)
 	if best == nil {
 		return best
 	}
+	//抽出后-最大权重值
 	best.CurrentWeight -= total
 	return best
 }

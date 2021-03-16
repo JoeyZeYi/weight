@@ -26,15 +26,15 @@ func TestNewWeighted(t *testing.T) {
 	//实例化三个礼物
 	gift1 := new(Gift)
 	gift1.Id = 1
-	gift1.Weight = 10
-	gift1.Num = 2
+	gift1.Weight = 5
+	gift1.Num = 1
 	gift2 := new(Gift)
 	gift2.Id = 2
-	gift2.Weight = 5
-	gift2.Num = 3
+	gift2.Weight = 3
+	gift2.Num = 1
 	gift3 := new(Gift)
 	gift3.Id = 3
-	gift3.Weight = 3
+	gift3.Weight = 2
 	gift3.Num = 1
 	//将三个礼物放到接口切片里
 	servers := make([]Weighted, 0)
@@ -43,8 +43,17 @@ func TestNewWeighted(t *testing.T) {
 	//实例化礼物的权重池
 	load := NewPool(servers)
 
-	for i := 1; i <= 18; i++ {
-		weighted := load.Draw(nil)
-		fmt.Println("当前循环为第", i, "次，选中的礼物ID为", weighted.GetId(), "中奖数量", weighted.GetNum())
+	for _, v := range load.Training {
+		fmt.Println("抽奖之前", v)
 	}
+
+	for i := 1; i <= 10; i++ {
+		weighted := load.Draw()
+		fmt.Println(weighted)
+
+	}
+	for _, v := range load.Training {
+		fmt.Println("抽奖之后", v)
+	}
+
 }
