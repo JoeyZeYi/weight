@@ -1,4 +1,4 @@
-# 基于Golang实现权重轮询算法、接口方式实现
+# 基于Golang实现平滑加权轮询算法、接口方式实现
 
 ### go get -u github.com/JoeyZeYi/weight
 
